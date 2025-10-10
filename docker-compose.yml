@@ -1,0 +1,28 @@
+services:
+  db:
+    image: postgres:16.2-alpine
+    container_name: universidade-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: senha 
+      POSTGRES_DB: universidade_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    container_name: universidade-app
+    depends_on:
+      - db
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/universidade_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=senha
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+
+volumes:
+  postgres_data:
