@@ -1,6 +1,7 @@
 package br.edu.ibmec.service;
 
 import br.edu.ibmec.entity.Aluno;
+import br.edu.ibmec.exception.ValidationException;
 import br.edu.ibmec.repository.AlunoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,7 +15,17 @@ public class AlunoService {
     @Autowired
     private AlunoRepository alunoRepository;
 
+    private void validateAluno(Aluno aluno) {
+        if (aluno.getMatricula() < 1 || aluno.getMatricula() > 99) {
+            throw new ValidationException("Matrícula do aluno deve estar entre 1 e 99");
+        }
+        if (aluno.getNome() == null || aluno.getNome().length() < 1 || aluno.getNome().length() > 20) {
+            throw new ValidationException("Nome do aluno deve ter entre 1 e 20 caracteres");
+        }
+    }
+
     public Aluno create(Aluno aluno) {
+        validateAluno(aluno);
         return alunoRepository.save(aluno);
     }
 
@@ -27,6 +38,7 @@ public class AlunoService {
     }
 
     public Aluno update(long id, Aluno alunoDetails) {
+        validateAluno(alunoDetails);
         Optional<Aluno> optionalAluno = alunoRepository.findById(id);
         if (optionalAluno.isPresent()) {
             Aluno aluno = optionalAluno.get();

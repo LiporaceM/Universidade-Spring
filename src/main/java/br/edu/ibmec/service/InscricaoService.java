@@ -1,6 +1,7 @@
 package br.edu.ibmec.service;
 
 import br.edu.ibmec.entity.Inscricao;
+import br.edu.ibmec.exception.ValidationException;
 import br.edu.ibmec.repository.InscricaoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,7 +15,20 @@ public class InscricaoService {
     @Autowired
     private InscricaoRepository inscricaoRepository;
 
+    private void validateInscricao(Inscricao inscricao) {
+        if (inscricao.getTurma() == null) {
+            throw new ValidationException("Inscrição deve estar associada a uma turma");
+        }
+        if (inscricao.getTurma().getCodigo() < 1 || inscricao.getTurma().getCodigo() > 999) {
+            throw new ValidationException("Código da turma na inscrição deve ser válido");
+        }
+        if (inscricao.getTurma().getAno() < 1900 || inscricao.getTurma().getAno() > 2024) {
+            throw new ValidationException("Ano da turma na inscrição deve ser válido");
+        }
+    }
+    
     public Inscricao create(Inscricao inscricao) {
+        validateInscricao(inscricao);
         return inscricaoRepository.save(inscricao);
     }
 
@@ -27,6 +41,7 @@ public class InscricaoService {
     }
 
     public Inscricao update(long id, Inscricao inscricaoDetails) {
+        validateInscricao(inscricaoDetails);
         Optional<Inscricao> optionalInscricao = inscricaoRepository.findById(id);
         if (optionalInscricao.isPresent()) {
             Inscricao inscricao = optionalInscricao.get();
