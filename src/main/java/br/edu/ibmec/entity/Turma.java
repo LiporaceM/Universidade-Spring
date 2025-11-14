@@ -25,6 +25,8 @@ public class Turma {
 
     private int semestre;
 
+    private int capacidade;
+
     @ManyToOne
     @JoinColumn(name = "disciplina_id")
     private Disciplina disciplina;

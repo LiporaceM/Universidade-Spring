@@ -1,5 +1,6 @@
 package br.edu.ibmec.Controller;
 
+import br.edu.ibmec.DTO.AlunoDTO;
 import br.edu.ibmec.entity.Aluno;
 import br.edu.ibmec.service.AlunoService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,9 +23,41 @@ public class AlunoController {
 
     @PostMapping
     @Operation(summary = "Create a new student")
-    public ResponseEntity<Aluno> create(@RequestBody Aluno aluno) {
-        return new ResponseEntity<>(alunoService.create(aluno), HttpStatus.CREATED);
+    public ResponseEntity<Aluno> create(@RequestBody AlunoDTO alunoDTO) {
+        return new ResponseEntity<>(alunoService.create(alunoDTO), HttpStatus.CREATED);
     }
+
+    @GetMapping
+    @Operation(summary = "Get all students")
+    public ResponseEntity<List<Aluno>> findAll() {
+        return new ResponseEntity<>(alunoService.findAll(), HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Get a student by ID")
+    public ResponseEntity<Aluno> findById(@PathVariable long id) {
+        Optional<Aluno> optionalAluno = alunoService.findById(id);
+        return optionalAluno.map(aluno -> new ResponseEntity<>(aluno, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "Update a student")
+    public ResponseEntity<Aluno> update(@PathVariable long id, @RequestBody Aluno alunoDetails) {
+        Aluno updatedAluno = alunoService.update(id, alunoDetails);
+        if (updatedAluno != null) {
+            return new ResponseEntity<>(updatedAluno, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Delete a student")
+    public ResponseEntity<Void> delete(@PathVariable long id) {
+        alunoService.delete(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+}
 
     @GetMapping
     @Operation(summary = "Get all students")

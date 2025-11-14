@@ -3,6 +3,10 @@ package br.edu.ibmec.service;
 import br.edu.ibmec.entity.Inscricao;
 import br.edu.ibmec.exception.ValidationException;
 import br.edu.ibmec.repository.InscricaoRepository;
+import br.edu.ibmec.validator.EnrollmentValidator;
+import br.edu.ibmec.validator.MatriculaAtivaValidator;
+import br.edu.ibmec.validator.DisciplinaBelongsToCursoValidator;
+import br.edu.ibmec.validator.TurmaCapacityValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,8 +31,27 @@ public class InscricaoService {
         }
     }
     
+    private EnrollmentValidator buildValidationChain() {
+        EnrollmentValidator matriculaValidator = new MatriculaAtivaValidator();
+        EnrollmentValidator cursoValidator = new DisciplinaBelongsToCursoValidator();
+        EnrollmentValidator capacityValidator = new TurmaCapacityValidator();
+        
+        matriculaValidator.setNextValidator(cursoValidator);
+        cursoValidator.setNextValidator(capacityValidator);
+        
+        return matriculaValidator;
+    }
+    
     public Inscricao create(Inscricao inscricao) {
         validateInscricao(inscricao);
+        
+        try {
+            EnrollmentValidator validationChain = buildValidationChain();
+            validationChain.executeChain(inscricao.getAluno(), inscricao.getTurma());
+        } catch (IllegalArgumentException e) {
+            throw new ValidationException(e.getMessage());
+        }
+        
         return inscricaoRepository.save(inscricao);
     }
 

@@ -1,7 +1,9 @@
 package br.edu.ibmec.service;
 
+import br.edu.ibmec.DTO.AlunoDTO;
 import br.edu.ibmec.entity.Aluno;
 import br.edu.ibmec.exception.ValidationException;
+import br.edu.ibmec.factory.AlunoFactory;
 import br.edu.ibmec.repository.AlunoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,9 @@ public class AlunoService {
 
     @Autowired
     private AlunoRepository alunoRepository;
+    
+    @Autowired
+    private AlunoFactory alunoFactory;
 
     private void validateAluno(Aluno aluno) {
         if (aluno.getMatricula() < 1 || aluno.getMatricula() > 99) {
@@ -24,7 +29,13 @@ public class AlunoService {
         }
     }
 
-    public Aluno create(Aluno aluno) {
+    public Aluno create(AlunoDTO alunoDTO) {
+        Aluno aluno = alunoFactory.createAlunoFromDTO(alunoDTO);
+        validateAluno(aluno);
+        return alunoRepository.save(aluno);
+    }
+
+    public Aluno createFromEntity(Aluno aluno) {
         validateAluno(aluno);
         return alunoRepository.save(aluno);
     }
