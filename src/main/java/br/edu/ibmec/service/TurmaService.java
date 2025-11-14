@@ -45,7 +45,9 @@ public class TurmaService {
             turma.setCodigo(turmaDetails.getCodigo());
             turma.setAno(turmaDetails.getAno());
             turma.setSemestre(turmaDetails.getSemestre());
+            turma.setCapacidade(turmaDetails.getCapacidade());
             turma.setDisciplina(turmaDetails.getDisciplina());
+            turma.setProfessor(turmaDetails.getProfessor());
             return turmaRepository.save(turma);
         }
         return null;

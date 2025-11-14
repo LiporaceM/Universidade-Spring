@@ -31,6 +31,10 @@ public class Turma {
     @JoinColumn(name = "disciplina_id")
     private Disciplina disciplina;
 
+    @ManyToOne
+    @JoinColumn(name = "professor_id")
+    private Professor professor;
+
     @OneToMany(mappedBy = "turma", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Inscricao> inscricoes = new ArrayList<>();
 
